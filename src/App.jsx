@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
-
 import "./App.css";
 
 const SEARCH_ENGINE_DATA_URL =
@@ -14,19 +13,17 @@ function App() {
   const [tableHeadRow, setTableHeadRow] = useState([]);
 
   const [filterTableData, setFilterTableData] = useState({});
-  const [inputValue, setInputValue] = useState("");
-  const [stores, setStores] = useState([]);
+  const [inputValue, setInputValue] = useState();
+  const [stores, setStores] = useState(["--blank--"]);
   const [displayValue, setDisplayValue] = useState("");
 
   const handleDropdown = (event) => {
     setInputValue(event.target.value);
     let i = 0;
-    for (; i < event.target.value.length; i++) {
-      if (event.target.value[i] === "-") {
-        break;
-      }
-    }
-    setDisplayValue(event.target.value.substring(0, i));
+    for (; i < event.target.value.length; i++)
+      if (event.target.value[i] === "-") break;
+
+    setDisplayValue(i == "0" ? "NULL" : event.target.value.substring(0, i));
   };
 
   useEffect(() => {
@@ -34,17 +31,14 @@ function App() {
       download: true,
       // header: true,
 
-      before: () => {},
+      before: () => {
+        setStores([]);
+      },
       complete: (results) => {
         for (let i = 0; i < 5; i++) {
           results.data.shift();
         }
-
-        // console.log(results.data)
-        // results.data.map((value, index) => console.log(value[2], value[7]));
-        results.data.map((value, index) =>
-          setStores((prev) => [...prev, value[2]])
-        );
+        results.data.map((value) => setStores((prev) => [...prev, value[2]]));
       },
     });
   }, []);
@@ -52,7 +46,6 @@ function App() {
   useEffect(() => {
     Papa.parse(SEARCH_ENGINE_DATA_URL, {
       download: true,
-      // header: true,
 
       before: () => {
         setTableHeadRow([]);
@@ -65,35 +58,24 @@ function App() {
           setTableHeadRow((prev) => [...prev, results.data[0][i]]);
         }
 
-        results.data.shift();
-        results.data.shift();
+        for (let i = 0; i < 2; i++) results.data.shift();
 
         results.data = results.data.filter((data) => {
           let flag = false;
           for (const index in data) {
-            if (data[index].length > 0) {
-              flag = true;
-            }
+            flag = flag || data[index].length > 0;
           }
           return flag;
         });
 
-        // console.log(tableHeadRow);
-
         for (let i in results.data) {
-          // console.log(headers[i]);
-
           let obj = {};
           for (let j in results.data[i]) {
-            // console.log(headers[j], ": ", results.data[i][j]);
             obj[headers[j]] = results.data[i][j];
           }
 
-          // console.log(obj);
           setTableData((prev) => [...prev, { ...obj }]);
-          // setTableData(prev => [...prev, {headers[i]: results.data[0][i]}]);
         }
-        // setTableData(results.data);
       },
     });
   }, []);
@@ -104,42 +86,40 @@ function App() {
     );
   }, [displayValue]);
 
-  // console.log(tableData);
-  console.log(filterTableData);
-
   return (
+    // https://codesandbox.io/s/react-custom-dropdown-select-demo-forked-276905
     <div className="App">
-      {stores && (
-        <label>
-          Choose columns:
-          <select value={inputValue} onChange={handleDropdown}>
-            {stores.map((store) => (
-              <option key={store} value={store}>
-                {store}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
+      <center>
+        {stores.length && tableData.length ? (
+          <h2> Kindly choose values </h2>
+        ) : (
+          <h2>just a second </h2>
+        )}
+        <select value={inputValue} onChange={handleDropdown}>
+          {stores.map((store) => (
+            <option key={store} value={store}>
+              {store}
+            </option>
+          ))}
+        </select>
+      </center>
 
       {filterTableData.length ? (
-        <div
-          style={{
-            border: "2px solid black",
-            borderSpacing: "0.5rem",
-            borderCollapse: "collapse",
-            top: "0",
-            width: "100%",
-          }}
-        >
-            <div>
-              {Object.values(filterTableData[0]).map((data, index) => (
-                <div key={data}>{tableHeadRow[index]} : {data}</div>
-              ))}
+        <div>
+          {Object.values(filterTableData[0]).map((data, index) => (
+            <div key={data + index}>
+              {tableHeadRow[index]} : {data}
             </div>
-          </div>
+          ))}
+        </div>
       ) : (
-        <h1> Loading ... </h1>
+        <>
+          {inputValue == null ? (
+            <h1> Loading ... </h1>
+          ) : (
+            <h1>Value not found </h1>
+          )}
+        </>
       )}
     </div>
   );
