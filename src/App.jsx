@@ -21,8 +21,9 @@ function App() {
     setInputValue(event.target.value);
     let i = 0;
     for (; i < event.target.value.length; i++)
-      if (event.target.value[i] === "-") break;
+      if (event.target.value[i] === "-" || event.target.value[i] === '_') break;
 
+    console.log(event.target.value.substring(0, i));
     setDisplayValue(i == "0" ? "NULL" : event.target.value.substring(0, i));
   };
 
