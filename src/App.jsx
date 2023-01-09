@@ -26,6 +26,13 @@ function App() {
     setDisplayValue(i == "0" ? "NULL" : event.target.value.substring(0, i));
   };
 
+  const isLink = (text) => {
+    if (text.length < 4) return false;
+    return (
+      text[0] === "h" && text[1] === "t" && text[2] === "t" && text[3] === "p"
+    );
+  };
+
   useEffect(() => {
     Papa.parse(RETAIL_URL, {
       download: true,
@@ -108,7 +115,13 @@ function App() {
         <div>
           {Object.values(filterTableData[0]).map((data, index) => (
             <div key={data + index}>
-              {tableHeadRow[index]} : {data}
+              {tableHeadRow[index]} :
+              {
+                isLink(data) ? (
+                  <a href={data}>Link</a>
+                ) :
+                <span>{data}</span>
+              }
             </div>
           ))}
         </div>
