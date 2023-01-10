@@ -1,7 +1,11 @@
 .App {
-  padding: 20px;
   /* text-align: center; */
 }
+
+.body {
+  padding: 6rem 18rem 20px 18rem;
+}
+
 
 .App-logo {
   height: 40vmin;

@@ -1,0 +1,27 @@
+
+.row {
+  border: 2px solid black;
+  border-collapse: collapse;
+
+  display: flex;
+  flex-flow: row wrap;
+  /* flex-wrap: wrap; */
+}
+
+a,
+.col {
+  flex: 1;
+  border-collapse: collapse;
+  justify-self: start;
+  padding: 2px;
+}
+
+.column1 {
+  border-right: 2px solid black;
+}
+
+
+.title {
+  margin: 4px 0px;
+  font-size: 2rem;
+}
